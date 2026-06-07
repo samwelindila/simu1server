@@ -28,11 +28,16 @@ export default {
       },
       animation: {
         'fade-in': 'fadeIn 0.4s ease-out',
-        'slide-up': 'slideUp 0.4s ease-out',
+        'slide-up': 'slideUp 0.45s ease-out both',
+        'card-in': 'cardIn 0.5s ease-out both',
       },
       keyframes: {
         fadeIn: { from: { opacity: '0' }, to: { opacity: '1' } },
         slideUp: { from: { opacity: '0', transform: 'translateY(12px)' }, to: { opacity: '1', transform: 'translateY(0)' } },
+        cardIn: {
+          from: { opacity: '0', transform: 'translateY(16px) scale(0.97)' },
+          to: { opacity: '1', transform: 'translateY(0) scale(1)' },
+        },
       },
     },
   },

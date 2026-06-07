@@ -1,5 +1,6 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
+import ScrollToTop from './components/ScrollToTop.jsx';
 import { AuthProvider, useAuth } from './context/AuthContext.jsx';
 import Catalog from './pages/customer/Catalog.jsx';
 import ProductDetail from './pages/customer/ProductDetail.jsx';
@@ -31,6 +32,7 @@ export default function App() {
           success: { iconTheme: { primary: '#1d6ff2', secondary: '#fff' } },
         }}
       />
+      <ScrollToTop />
       <Routes>
         {/* Customer */}
         <Route path="/" element={<Catalog />} />

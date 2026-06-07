@@ -30,6 +30,7 @@ export default {
         'fade-in': 'fadeIn 0.4s ease-out',
         'slide-up': 'slideUp 0.45s ease-out both',
         'card-in': 'cardIn 0.5s ease-out both',
+        'slide-from-top': 'slideFromTop 0.35s ease-out both',
       },
       keyframes: {
         fadeIn: { from: { opacity: '0' }, to: { opacity: '1' } },
@@ -37,6 +38,10 @@ export default {
         cardIn: {
           from: { opacity: '0', transform: 'translateY(16px) scale(0.97)' },
           to: { opacity: '1', transform: 'translateY(0) scale(1)' },
+        },
+        slideFromTop: {
+          from: { opacity: '0', transform: 'translateY(-16px)' },
+          to: { opacity: '1', transform: 'translateY(0)' },
         },
       },
     },

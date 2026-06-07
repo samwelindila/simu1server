@@ -16,6 +16,10 @@ export default function ProductDetail() {
   const [showFullDetails, setShowFullDetails] = useState(false);
 
   useEffect(() => {
+    setLoading(true);
+    setImgIndex(0);
+    setShowFullDetails(false);
+    window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
     api.get(`/api/products/${id}`)
       .then(r => setProduct(r.data))
       .finally(() => setLoading(false));
@@ -23,8 +27,11 @@ export default function ProductDetail() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
-        <div className="w-8 h-8 border-2 border-brand-500 border-t-transparent rounded-full animate-spin" />
+      <div className="min-h-screen bg-slate-50 flex flex-col text-slate-800">
+        <StoreNavbar backTo="/" />
+        <div className="flex-1 flex items-center justify-center">
+          <div className="w-8 h-8 border-2 border-brand-500 border-t-transparent rounded-full animate-spin" />
+        </div>
       </div>
     );
   }
@@ -49,7 +56,7 @@ export default function ProductDetail() {
     <div className="min-h-screen bg-slate-50 flex flex-col text-slate-800">
       <StoreNavbar backTo="/" />
 
-      <div className="max-w-5xl mx-auto w-full px-4 py-5 sm:py-8 flex-1 animate-fade-in">
+      <div className="max-w-5xl mx-auto w-full px-4 py-5 sm:py-8 flex-1 animate-slide-from-top">
         {/* Breadcrumb */}
         <nav className="text-xs font-body text-slate-400 mb-4 flex items-center gap-1.5">
           <Link to="/" className="hover:text-brand-500 transition-colors">Home</Link>

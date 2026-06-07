@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect } from 'react';
-import axios from 'axios';
+import api from '../api/axios.js';
 
 const AuthContext = createContext();
 
@@ -9,24 +9,24 @@ export function AuthProvider({ children }) {
 
   useEffect(() => {
     if (token) {
-      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-      axios.get('/api/auth/me')
+      api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+      api.get('/api/auth/me')
         .then(r => setAdmin(r.data))
         .catch(() => logout());
     }
   }, [token]);
 
   const login = async (email, password) => {
-    const r = await axios.post('/api/auth/login', { email, password });
+    const r = await api.post('/api/auth/login', { email, password });
     localStorage.setItem('simu1_token', r.data.token);
-    axios.defaults.headers.common['Authorization'] = `Bearer ${r.data.token}`;
+    api.defaults.headers.common['Authorization'] = `Bearer ${r.data.token}`;
     setToken(r.data.token);
     setAdmin({ email: r.data.email });
   };
 
   const logout = () => {
     localStorage.removeItem('simu1_token');
-    delete axios.defaults.headers.common['Authorization'];
+    delete api.defaults.headers.common['Authorization'];
     setToken(null);
     setAdmin(null);
   };

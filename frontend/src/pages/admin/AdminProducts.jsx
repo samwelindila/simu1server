@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import axios from 'axios';
+import api, { asArray, mediaUrl } from '../../api/axios.js';
 import toast from 'react-hot-toast';
 import { Pencil, Trash2, Plus, Package, Star } from 'lucide-react';
 
@@ -11,8 +11,8 @@ export default function AdminProducts() {
   const fetchProducts = async () => {
     setLoading(true);
     try {
-      const r = await axios.get('/api/products');
-      setProducts(r.data);
+      const r = await api.get('/api/products');
+      setProducts(asArray(r.data));
     } finally {
       setLoading(false);
     }
@@ -23,7 +23,7 @@ export default function AdminProducts() {
   const handleDelete = async (id, name) => {
     if (!confirm(`Delete "${name}"?`)) return;
     try {
-      await axios.delete(`/api/products/${id}`);
+      await api.delete(`/api/products/${id}`);
       toast.success('Product deleted');
       fetchProducts();
     } catch {
@@ -80,7 +80,7 @@ export default function AdminProducts() {
                       <div className="flex items-center gap-3">
                         <div className="w-12 h-12 bg-slate-100 rounded-xl overflow-hidden shrink-0 border border-slate-200">
                           {p.images?.[0] ? (
-                            <img src={p.images[0]} alt={p.name} className="w-full h-full object-cover" />
+                            <img src={mediaUrl(p.images[0])} alt={p.name} className="w-full h-full object-cover" />
                           ) : (
                             <div className="w-full h-full flex items-center justify-center text-slate-300">
                               <Package size={18} />
@@ -129,7 +129,7 @@ export default function AdminProducts() {
                 <div className="flex gap-3">
                   <div className="w-16 h-16 bg-slate-100 rounded-xl overflow-hidden shrink-0 border border-slate-200">
                     {p.images?.[0] ? (
-                      <img src={p.images[0]} alt={p.name} className="w-full h-full object-cover" />
+                      <img src={mediaUrl(p.images[0])} alt={p.name} className="w-full h-full object-cover" />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center text-slate-300">
                         <Package size={20} />

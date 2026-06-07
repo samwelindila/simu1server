@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import axios from 'axios';
+import api, { mediaUrl } from '../../api/axios.js';
 import { ChevronLeft, ChevronRight, Phone, Smartphone, Check } from 'lucide-react';
 import StoreNavbar from '../../components/StoreNavbar.jsx';
 import StoreFooter from '../../components/StoreFooter.jsx';
@@ -16,7 +16,7 @@ export default function ProductDetail() {
   const [showFullDetails, setShowFullDetails] = useState(false);
 
   useEffect(() => {
-    axios.get(`/api/products/${id}`)
+    api.get(`/api/products/${id}`)
       .then(r => setProduct(r.data))
       .finally(() => setLoading(false));
   }, [id]);
@@ -65,7 +65,7 @@ export default function ProductDetail() {
             <div className="relative panel overflow-hidden aspect-square w-full">
               {images.length > 0 ? (
                 <>
-                  <img src={images[imgIndex]} alt={product.name} className="w-full h-full object-contain bg-slate-50 p-3" />
+                  <img src={mediaUrl(images[imgIndex])} alt={product.name} className="w-full h-full object-contain bg-slate-50 p-3" />
                   {images.length > 1 && (
                     <>
                       <button
@@ -102,7 +102,7 @@ export default function ProductDetail() {
                     onClick={() => setImgIndex(i)}
                     className={`shrink-0 w-14 h-14 rounded-lg overflow-hidden border-2 transition-all ${i === imgIndex ? 'border-brand-500 ring-1 ring-brand-100' : 'border-slate-200 opacity-70 hover:opacity-100'}`}
                   >
-                    <img src={img} alt="" className="w-full h-full object-cover" />
+                    <img src={mediaUrl(img)} alt="" className="w-full h-full object-cover" />
                   </button>
                 ))}
               </div>

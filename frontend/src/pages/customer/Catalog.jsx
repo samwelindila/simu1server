@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios';
 import { Link } from 'react-router-dom';
+import api, { asArray, mediaUrl } from '../../api/axios.js';
 import { Search, Smartphone, Headphones, Zap, Shield, Package, Tablet, Truck, BadgeCheck, MessageCircle, Star } from 'lucide-react';
 import StoreNavbar from '../../components/StoreNavbar.jsx';
 import StoreFooter from '../../components/StoreFooter.jsx';
@@ -27,11 +27,12 @@ const TRUST = [
 
 function ProductCard({ product, featured = false }) {
   const img = product.images?.[0];
+  const imgSrc = mediaUrl(img);
   return (
     <Link to={`/product/${product._id}`} className={`card group flex flex-col overflow-hidden animate-slide-up ${featured ? 'ring-2 ring-brand-100' : ''}`}>
       <div className="relative bg-slate-50 overflow-hidden aspect-[4/5] max-h-44 sm:max-h-48">
-        {img ? (
-          <img src={img} alt={product.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+        {imgSrc ? (
+          <img src={imgSrc} alt={product.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
         ) : (
           <div className="w-full h-full flex items-center justify-center text-slate-200">
             <Smartphone size={28} strokeWidth={1.5} />
@@ -69,7 +70,9 @@ export default function Catalog() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    axios.get('/api/categories').then(r => setCategories(r.data)).catch(() => {});
+    api.get('/api/categories')
+      .then(r => setCategories(asArray(r.data).length ? asArray(r.data) : ['All']))
+      .catch(() => setCategories(['All']));
     fetchProducts();
   }, []);
 
@@ -79,8 +82,10 @@ export default function Catalog() {
     setLoading(true);
     try {
       const params = activeCategory !== 'All' ? { category: activeCategory } : {};
-      const r = await axios.get('/api/products', { params });
-      setProducts(r.data);
+      const r = await api.get('/api/products', { params });
+      setProducts(asArray(r.data));
+    } catch {
+      setProducts([]);
     } finally {
       setLoading(false);
     }

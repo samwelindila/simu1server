@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import api, { mediaUrl } from '../../api/axios.js';
 import toast from 'react-hot-toast';
 import { ArrowLeft, X, Upload, ImagePlus } from 'lucide-react';
 
@@ -22,7 +22,7 @@ export default function AdminProductForm() {
 
   useEffect(() => {
     if (isEdit) {
-      axios.get(`/api/products/${id}`).then(r => {
+      api.get(`/api/products/${id}`).then(r => {
         const p = r.data;
         setForm({
           name: p.name, price: p.price, description: p.description || '',
@@ -57,10 +57,10 @@ export default function AdminProductForm() {
       newFiles.forEach(file => fd.append('images', file));
 
       if (isEdit) {
-        await axios.put(`/api/products/${id}`, fd);
+        await api.put(`/api/products/${id}`, fd);
         toast.success('Product updated!');
       } else {
-        await axios.post('/api/products', fd);
+        await api.post('/api/products', fd);
         toast.success('Product added!');
       }
       navigate('/admin/products');
@@ -95,7 +95,7 @@ export default function AdminProductForm() {
           <div className="flex flex-wrap gap-3 mb-4">
             {existingImages.map(img => (
               <div key={img} className="relative w-20 h-20 rounded-xl overflow-hidden border border-slate-200 group">
-                <img src={img} alt="" className="w-full h-full object-cover" />
+                <img src={mediaUrl(img)} alt="" className="w-full h-full object-cover" />
                 <button
                   type="button"
                   onClick={() => removeExisting(img)}

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import axios from 'axios';
+import api, { asArray } from '../../api/axios.js';
 import { Package, Star, AlertCircle, Plus, ArrowUpRight } from 'lucide-react';
 
 function StatCard({ icon: Icon, label, value, accent }) {
@@ -26,8 +26,8 @@ export default function AdminDashboard() {
   const [stats, setStats] = useState({ total: 0, featured: 0, outOfStock: 0 });
 
   useEffect(() => {
-    axios.get('/api/products').then(r => {
-      const products = r.data;
+    api.get('/api/products').then(r => {
+      const products = asArray(r.data);
       setStats({
         total: products.length,
         featured: products.filter(p => p.featured).length,

@@ -1,7 +1,7 @@
 import { Phone, Instagram, Mail, MapPin } from 'lucide-react';
 import Logo from './Logo.jsx';
-
-const WHATSAPP = '255613374380';
+import WhatsAppIcon from './WhatsAppIcon.jsx';
+import { WHATSAPP_E164, WHATSAPP_DISPLAY, PHONE_E164, PHONE_DISPLAY } from '../constants/contact.js';
 
 export default function StoreFooter() {
   return (
@@ -20,8 +20,13 @@ export default function StoreFooter() {
             <h4 className="font-display font-semibold text-sm text-white mb-3">Contact</h4>
             <ul className="space-y-2.5 text-sm font-body">
               <li>
-                <a href={`https://wa.me/${WHATSAPP}`} target="_blank" rel="noreferrer" className="flex items-center gap-2 text-slate-400 hover:text-emerald-400 transition-colors">
-                  <Phone size={14} /> +255 613 374 380
+                <a href={`https://wa.me/${WHATSAPP_E164}`} target="_blank" rel="noreferrer" className="flex items-center gap-2 text-slate-400 hover:text-emerald-400 transition-colors">
+                  <WhatsAppIcon className="w-3.5 h-3.5" /> WhatsApp {WHATSAPP_DISPLAY}
+                </a>
+              </li>
+              <li>
+                <a href={`tel:+${PHONE_E164}`} className="flex items-center gap-2 text-slate-400 hover:text-brand-300 transition-colors">
+                  <Phone size={14} /> {PHONE_DISPLAY}
                 </a>
               </li>
               <li>

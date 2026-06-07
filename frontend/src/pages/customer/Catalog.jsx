@@ -5,8 +5,7 @@ import { Search, Smartphone, Headphones, Zap, Shield, Package, Tablet, Truck, Ba
 import StoreNavbar from '../../components/StoreNavbar.jsx';
 import StoreFooter from '../../components/StoreFooter.jsx';
 import WhatsAppIcon from '../../components/WhatsAppIcon.jsx';
-
-const WHATSAPP = '255613374380';
+import { WHATSAPP_E164 } from '../../constants/contact.js';
 
 const CATEGORY_ICONS = {
   Smartphones: Smartphone,
@@ -252,7 +251,7 @@ export default function Catalog() {
 
       {/* Mobile WhatsApp FAB */}
       <a
-        href={`https://wa.me/${WHATSAPP}`}
+        href={`https://wa.me/${WHATSAPP_E164}`}
         target="_blank"
         rel="noreferrer"
         className="fixed bottom-5 right-5 z-50 sm:hidden flex items-center justify-center w-14 h-14 bg-emerald-500 hover:bg-emerald-600 text-white rounded-full shadow-lg shadow-emerald-500/30 transition-transform hover:scale-105 active:scale-95"

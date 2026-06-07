@@ -5,8 +5,7 @@ import { ChevronLeft, ChevronRight, Phone, Smartphone, Check } from 'lucide-reac
 import StoreNavbar from '../../components/StoreNavbar.jsx';
 import StoreFooter from '../../components/StoreFooter.jsx';
 import WhatsAppIcon from '../../components/WhatsAppIcon.jsx';
-
-const WHATSAPP = '255613374380';
+import { WHATSAPP_E164, PHONE_E164, PHONE_DISPLAY } from '../../constants/contact.js';
 
 export default function ProductDetail() {
   const { id } = useParams();
@@ -175,7 +174,7 @@ export default function ProductDetail() {
 
             <div className="mt-auto space-y-2.5 lg:sticky lg:top-20">
               <a
-                href={`https://wa.me/${WHATSAPP}?text=${encodeURIComponent(waMessage)}`}
+                href={`https://wa.me/${WHATSAPP_E164}?text=${encodeURIComponent(waMessage)}`}
                 target="_blank"
                 rel="noreferrer"
                 className="flex items-center justify-center gap-2 w-full bg-emerald-500 hover:bg-emerald-600 text-white font-display font-bold py-3 rounded-xl transition-all shadow-sm hover:shadow-md text-sm"
@@ -184,10 +183,10 @@ export default function ProductDetail() {
                 Order via WhatsApp
               </a>
               <a
-                href="tel:+255613374380"
+                href={`tel:+${PHONE_E164}`}
                 className="flex items-center justify-center gap-2 w-full btn-outline py-2.5 rounded-xl text-sm"
               >
-                <Phone size={15} /> Call +255 613 374 380
+                <Phone size={15} /> Call {PHONE_DISPLAY}
               </a>
             </div>
           </div>

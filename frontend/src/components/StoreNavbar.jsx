@@ -1,8 +1,7 @@
 import { Link } from 'react-router-dom';
 import { Phone } from 'lucide-react';
 import { LogoLink } from './Logo.jsx';
-
-const WHATSAPP = '255613374380';
+import { WHATSAPP_E164 } from '../constants/contact.js';
 
 export default function StoreNavbar({ backTo }) {
   return (
@@ -19,7 +18,7 @@ export default function StoreNavbar({ backTo }) {
           <>
             <LogoLink to="/" size="md" showTagline />
             <a
-              href={`https://wa.me/${WHATSAPP}`}
+              href={`https://wa.me/${WHATSAPP_E164}`}
               target="_blank"
               rel="noreferrer"
               className="flex items-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-white text-sm font-display font-semibold px-4 py-2.5 rounded-xl transition-all shadow-sm hover:shadow-md shrink-0"

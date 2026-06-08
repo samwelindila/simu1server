@@ -26,9 +26,14 @@ const TRUST = [
 
 const PRODUCT_GRID = 'products-grid';
 
+function firstProductImage(product) {
+  return asArray(product.images).find(img => img && !img.startsWith('/uploads/')) || null;
+}
+
 function ProductCard({ product, featured = false, index = 0 }) {
-  const img = product.images?.[0];
+  const img = firstProductImage(product);
   const imgSrc = mediaUrl(img);
+  const photoCount = product.imageCount || asArray(product.images).length;
   return (
     <Link
       to={`/product/${product._id}`}
@@ -56,6 +61,11 @@ function ProductCard({ product, featured = false, index = 0 }) {
         {product.featured && (
           <span className="absolute top-2 right-2 bg-amber-400 text-amber-950 text-[10px] sm:text-xs font-display font-bold uppercase tracking-wide px-2 py-0.5 sm:py-1 rounded-md flex items-center gap-0.5 shadow-sm">
             <Star size={10} fill="currentColor" /> Featured
+          </span>
+        )}
+        {photoCount > 1 && (
+          <span className="absolute bottom-2 right-2 bg-slate-900/75 text-white text-[10px] font-display font-semibold px-2 py-0.5 rounded-md">
+            {photoCount} photos
           </span>
         )}
       </div>

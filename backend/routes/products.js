@@ -2,13 +2,19 @@ import express from 'express';
 import multer from 'multer';
 import Product from '../models/Product.js';
 import { protect } from '../middleware/auth.js';
-import { saveUploadedFiles, parseFormArray } from '../utils/imageStorage.js';
+import {
+  saveUploadedFiles,
+  parseFormArray,
+  normalizeImages,
+  productForList,
+  isBrokenLegacyPath,
+} from '../utils/imageStorage.js';
 
 const router = express.Router();
 
 const upload = multer({
   storage: multer.memoryStorage(),
-  limits: { fileSize: 5 * 1024 * 1024, files: 5 },
+  limits: { fileSize: 700 * 1024, files: 5 },
 });
 
 const uploadImages = (req, res, next) => {
@@ -18,6 +24,16 @@ const uploadImages = (req, res, next) => {
   });
 };
 
+function parseExistingImages(raw) {
+  if (!raw) return [];
+  try {
+    const parsed = JSON.parse(raw);
+    return normalizeImages(parsed).filter(img => !isBrokenLegacyPath(img));
+  } catch {
+    return normalizeImages(parseFormArray(raw)).filter(img => !isBrokenLegacyPath(img));
+  }
+}
+
 // Public
 router.get('/', async (req, res) => {
   try {
@@ -26,7 +42,7 @@ router.get('/', async (req, res) => {
     if (category && category !== 'All') filter.category = category;
     if (featured === 'true') filter.featured = true;
     const products = await Product.find(filter).sort({ createdAt: -1 });
-    res.json(products);
+    res.json(products.map(productForList));
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
@@ -36,7 +52,10 @@ router.get('/:id', async (req, res) => {
   try {
     const product = await Product.findById(req.params.id);
     if (!product) return res.status(404).json({ message: 'Not found' });
-    res.json(product);
+    const doc = product.toObject();
+    doc.images = normalizeImages(doc.images);
+    doc.imageCount = doc.images.length;
+    res.json(doc);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
@@ -47,6 +66,9 @@ router.post('/', protect, uploadImages, async (req, res) => {
   try {
     const { name, price, description, specs, category, inStock, featured } = req.body;
     const images = (await saveUploadedFiles(req.files)).slice(0, 5);
+    if (!images.length) {
+      return res.status(400).json({ message: 'Add at least one product image' });
+    }
     const product = await Product.create({
       name,
       price: Number(price),
@@ -57,7 +79,9 @@ router.post('/', protect, uploadImages, async (req, res) => {
       featured: featured === 'true',
       images,
     });
-    res.status(201).json(product);
+    const doc = product.toObject();
+    doc.imageCount = doc.images.length;
+    res.status(201).json(doc);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
@@ -66,15 +90,7 @@ router.post('/', protect, uploadImages, async (req, res) => {
 router.put('/:id', protect, uploadImages, async (req, res) => {
   try {
     const { name, price, description, specs, category, inStock, featured, existingImages } = req.body;
-    let kept = [];
-    if (existingImages) {
-      try {
-        const parsed = JSON.parse(existingImages);
-        kept = Array.isArray(parsed) ? parsed : parseFormArray(existingImages);
-      } catch {
-        kept = parseFormArray(existingImages);
-      }
-    }
+    const kept = parseExistingImages(existingImages);
     const newImages = await saveUploadedFiles(req.files);
     const images = [...kept, ...newImages].slice(0, 5);
 
@@ -92,7 +108,10 @@ router.put('/:id', protect, uploadImages, async (req, res) => {
       },
       { new: true }
     );
-    res.json(product);
+    const doc = product.toObject();
+    doc.images = normalizeImages(doc.images);
+    doc.imageCount = doc.images.length;
+    res.json(doc);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }

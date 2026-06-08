@@ -12,7 +12,6 @@ import { fileURLToPath } from 'url';
 import authRoutes from './routes/auth.js';
 import productRoutes from './routes/products.js';
 import categoryRoutes from './routes/categories.js';
-import imageRoutes from './routes/images.js';
 
 dotenv.config();
 
@@ -45,7 +44,6 @@ app.get('/health', (req, res) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/categories', categoryRoutes);
-app.use('/api/images', imageRoutes);
 
 app.use((req, res) => {
   res.status(404).json({ message: 'Route not found' });
@@ -56,6 +54,15 @@ const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
   connectDb();
+}).on('error', (err) => {
+  if (err.code === 'EADDRINUSE') {
+    console.error(`❌ Port ${PORT} is already in use.`);
+    console.error('   Stop the other backend (Ctrl+C in that terminal), or run:');
+    console.error(`   netstat -ano | findstr :${PORT}`);
+    console.error('   taskkill /PID <PID> /F');
+    process.exit(1);
+  }
+  throw err;
 });
 
 async function connectDb() {

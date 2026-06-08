@@ -7,6 +7,16 @@ import StoreFooter from '../../components/StoreFooter.jsx';
 import WhatsAppIcon from '../../components/WhatsAppIcon.jsx';
 import { WHATSAPP_E164, PHONE_E164, PHONE_DISPLAY } from '../../constants/contact.js';
 
+function normalizeProductImages(images) {
+  if (!images) return [];
+  const list = Array.isArray(images)
+    ? images
+    : typeof images === 'string' && images
+      ? [images]
+      : [];
+  return list.filter(img => img && !img.startsWith('/uploads/'));
+}
+
 export default function ProductDetail() {
   const { id } = useParams();
   const [product, setProduct] = useState(null);
@@ -45,7 +55,7 @@ export default function ProductDetail() {
     );
   }
 
-  const images = product.images?.length ? product.images : [];
+  const images = normalizeProductImages(product.images);
   const waMessage = `Habari! Nataka kuorder: *${product.name}*\nBei: TZS ${Number(product.price).toLocaleString()}\n\nNaomba maelezo zaidi.`;
   const specLines = product.specs?.split('\n').filter(Boolean) || [];
   const hasLongDescription = (product.description?.length || 0) > 120;
@@ -101,17 +111,23 @@ export default function ProductDetail() {
               )}
             </div>
             {images.length > 1 && (
-              <div className="flex gap-2 mt-3 overflow-x-auto scrollbar-hide justify-center lg:justify-start">
-                {images.map((img, i) => (
-                  <button
-                    key={i}
-                    onClick={() => setImgIndex(i)}
-                    className={`shrink-0 w-14 h-14 rounded-lg overflow-hidden border-2 transition-all ${i === imgIndex ? 'border-brand-500 ring-1 ring-brand-100' : 'border-slate-200 opacity-70 hover:opacity-100'}`}
-                  >
-                    <img src={mediaUrl(img)} alt="" className="w-full h-full object-cover" />
-                  </button>
-                ))}
-              </div>
+              <>
+                <p className="text-center text-xs text-slate-400 mt-2 font-body">
+                  {imgIndex + 1} / {images.length} · tap thumbnails to switch
+                </p>
+                <div className="flex gap-2 mt-2 overflow-x-auto scrollbar-hide justify-center lg:justify-start pb-1">
+                  {images.map((img, i) => (
+                    <button
+                      key={i}
+                      type="button"
+                      onClick={() => setImgIndex(i)}
+                      className={`shrink-0 w-14 h-14 rounded-lg overflow-hidden border-2 transition-all ${i === imgIndex ? 'border-brand-500 ring-1 ring-brand-100' : 'border-slate-200 opacity-70 hover:opacity-100'}`}
+                    >
+                      <img src={mediaUrl(img)} alt="" className="w-full h-full object-cover" />
+                    </button>
+                  ))}
+                </div>
+              </>
             )}
           </div>
 

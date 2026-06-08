@@ -28,7 +28,7 @@ export default function AdminProductForm() {
           name: p.name, price: p.price, description: p.description || '',
           specs: p.specs || '', category: p.category, inStock: p.inStock, featured: p.featured,
         });
-        setExistingImages(p.images || []);
+        setExistingImages((p.images || []).filter(img => img && !img.startsWith('/uploads/')));
       });
     }
   }, [id]);
@@ -57,6 +57,11 @@ export default function AdminProductForm() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    const totalImages = existingImages.length + newFiles.length;
+    if (totalImages === 0) {
+      toast.error('Add at least one product image');
+      return;
+    }
     setLoading(true);
     try {
       const fd = new FormData();
@@ -138,8 +143,13 @@ export default function AdminProductForm() {
             )}
           </div>
           <p className="text-xs text-slate-400 font-body">
-            {existingImages.length + newFiles.length} of 5 images · tap Add to upload more
+            {existingImages.length + newFiles.length} of 5 images · select multiple at once or tap Add again
           </p>
+          {isEdit && (existingImages.length + newFiles.length) === 0 && (
+            <p className="text-xs text-amber-600 font-body mt-2">
+              Old images were lost on the server. Please upload photos again and save.
+            </p>
+          )}
         </div>
 
         {/* Details */}

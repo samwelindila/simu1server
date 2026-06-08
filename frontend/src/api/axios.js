@@ -21,8 +21,9 @@ export function normalizeApiBase(raw) {
   return url.replace(/\/$/, '');
 }
 
-/** Backend root, e.g. https://simu1server.onrender.com */
-export const API_BASE = normalizeApiBase(import.meta.env.VITE_API_URL);
+/** Backend root — fallback if Netlify env var missing at build time */
+export const API_BASE =
+  normalizeApiBase(import.meta.env.VITE_API_URL) || 'https://simu1server.onrender.com';
 
 const api = axios.create({
   baseURL: API_BASE,

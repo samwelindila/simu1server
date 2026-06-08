@@ -1,5 +1,5 @@
-/** Max raw file size before base64 encoding (~700KB keeps each product doc well under MongoDB limits). */
-const MAX_BYTES = 700 * 1024;
+/** Max raw file size before base64 encoding */
+const MAX_BYTES = 1500 * 1024;
 
 function safeName(originalname) {
   return (originalname || 'image.jpg').replace(/\s/g, '_').replace(/[^\w.-]/g, '') || 'image.jpg';

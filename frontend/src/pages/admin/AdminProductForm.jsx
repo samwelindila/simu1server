@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import api, { mediaUrl } from '../../api/axios.js';
 import toast from 'react-hot-toast';
 import { ArrowLeft, X, Upload, ImagePlus } from 'lucide-react';
+import { compressImageFiles } from '../../utils/compressImage.js';
 
 const CATEGORIES = ['Smartphones', 'Accessories', 'Tablets', 'Earphones', 'Chargers', 'Cases & Covers', 'Other'];
 
@@ -33,20 +34,32 @@ export default function AdminProductForm() {
     }
   }, [id]);
 
-  const handleFiles = (e) => {
-    const files = Array.from(e.target.files || []);
-    if (!files.length) return;
+  const handleFiles = async (e) => {
+    const picked = Array.from(e.target.files || []);
+    e.target.value = '';
+    if (!picked.length) return;
 
-    const total = existingImages.length + newFiles.length + files.length;
-    if (total > 5) {
-      toast.error(`Maximum 5 images. You can add ${5 - existingImages.length - newFiles.length} more.`);
-      e.target.value = '';
+    const room = 5 - existingImages.length - newFiles.length;
+    if (room <= 0) {
+      toast.error('Maximum 5 images per product');
       return;
     }
 
-    setNewFiles(prev => [...prev, ...files]);
-    setPreviews(prev => [...prev, ...files.map(f => URL.createObjectURL(f))]);
-    e.target.value = '';
+    const toAdd = picked.slice(0, room);
+    if (picked.length > room) {
+      toast.error(`Only ${room} more image(s) allowed (max 5 total)`);
+    }
+
+    try {
+      toast.loading('Preparing photos…', { id: 'compress' });
+      const compressed = await compressImageFiles(toAdd);
+      toast.dismiss('compress');
+      setNewFiles(prev => [...prev, ...compressed]);
+      setPreviews(prev => [...prev, ...compressed.map(f => URL.createObjectURL(f))]);
+    } catch {
+      toast.dismiss('compress');
+      toast.error('Could not process one of the images. Try smaller photos.');
+    }
   };
 
   const removeExisting = (img) => setExistingImages(prev => prev.filter(i => i !== img));
@@ -74,11 +87,11 @@ export default function AdminProductForm() {
       newFiles.forEach(file => fd.append('images', file));
 
       if (isEdit) {
-        await api.put(`/api/products/${id}`, fd);
-        toast.success('Product updated!');
+        const r = await api.put(`/api/products/${id}`, fd);
+        toast.success(`Saved with ${r.data.images?.length || 0} image(s)!`);
       } else {
-        await api.post('/api/products', fd);
-        toast.success('Product added!');
+        const r = await api.post('/api/products', fd);
+        toast.success(`Added with ${r.data.images?.length || 0} image(s)!`);
       }
       navigate('/admin/products');
     } catch (err) {

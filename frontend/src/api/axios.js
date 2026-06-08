@@ -32,11 +32,11 @@ export function asArray(data) {
   return Array.isArray(data) ? data : [];
 }
 
-/** Turn /uploads/... paths into full URLs in production */
+/** Turn /uploads/... or /api/images/... paths into full URLs in production */
 export function mediaUrl(path) {
   if (!path) return '';
-  if (path.startsWith('http://') || path.startsWith('https://')) return path;
-  return `${API_BASE}${path}`;
+  if (path.startsWith('http://') || path.startsWith('https://') || path.startsWith('blob:')) return path;
+  return `${API_BASE}${path.startsWith('/') ? path : `/${path}`}`;
 }
 
 export default api;

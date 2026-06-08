@@ -12,6 +12,7 @@ import { fileURLToPath } from 'url';
 import authRoutes from './routes/auth.js';
 import productRoutes from './routes/products.js';
 import categoryRoutes from './routes/categories.js';
+import imageRoutes from './routes/images.js';
 
 dotenv.config();
 
@@ -44,6 +45,7 @@ app.get('/health', (req, res) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/categories', categoryRoutes);
+app.use('/api/images', imageRoutes);
 
 app.use((req, res) => {
   res.status(404).json({ message: 'Route not found' });

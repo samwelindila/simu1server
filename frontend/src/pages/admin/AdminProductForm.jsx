@@ -34,9 +34,19 @@ export default function AdminProductForm() {
   }, [id]);
 
   const handleFiles = (e) => {
-    const files = Array.from(e.target.files);
+    const files = Array.from(e.target.files || []);
+    if (!files.length) return;
+
+    const total = existingImages.length + newFiles.length + files.length;
+    if (total > 5) {
+      toast.error(`Maximum 5 images. You can add ${5 - existingImages.length - newFiles.length} more.`);
+      e.target.value = '';
+      return;
+    }
+
     setNewFiles(prev => [...prev, ...files]);
     setPreviews(prev => [...prev, ...files.map(f => URL.createObjectURL(f))]);
+    e.target.value = '';
   };
 
   const removeExisting = (img) => setExistingImages(prev => prev.filter(i => i !== img));
@@ -53,7 +63,9 @@ export default function AdminProductForm() {
       Object.entries(form).forEach(([k, v]) => {
         fd.append(k, typeof v === 'boolean' ? String(v) : v);
       });
-      existingImages.forEach(img => fd.append('existingImages', img));
+      if (isEdit) {
+        fd.append('existingImages', JSON.stringify(existingImages));
+      }
       newFiles.forEach(file => fd.append('images', file));
 
       if (isEdit) {
@@ -117,13 +129,17 @@ export default function AdminProductForm() {
                 </button>
               </div>
             ))}
+            {existingImages.length + newFiles.length < 5 && (
             <label className="w-20 h-20 rounded-xl border-2 border-dashed border-slate-200 hover:border-brand-400 hover:bg-brand-50 flex flex-col items-center justify-center cursor-pointer transition-all text-slate-400 hover:text-brand-500">
               <Upload size={20} />
               <span className="text-[10px] mt-1 font-display font-semibold">Add</span>
               <input type="file" accept="image/*" multiple className="hidden" onChange={handleFiles} />
             </label>
+            )}
           </div>
-          <p className="text-xs text-slate-400 font-body">Up to 5 images. Hover to remove.</p>
+          <p className="text-xs text-slate-400 font-body">
+            {existingImages.length + newFiles.length} of 5 images · tap Add to upload more
+          </p>
         </div>
 
         {/* Details */}

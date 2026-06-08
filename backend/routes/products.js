@@ -1,22 +1,15 @@
 import express from 'express';
 import multer from 'multer';
-import path from 'path';
-import { fileURLToPath } from 'url';
 import Product from '../models/Product.js';
 import { protect } from '../middleware/auth.js';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+import { saveUploadedFiles, parseFormArray } from '../utils/imageStorage.js';
 
 const router = express.Router();
 
-const storage = multer.diskStorage({
-  destination: path.join(__dirname, '../uploads'),
-  filename: (req, file, cb) => {
-    cb(null, `${Date.now()}-${file.originalname.replace(/\s/g, '_')}`);
-  }
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 5 * 1024 * 1024, files: 5 },
 });
-const upload = multer({ storage, limits: { fileSize: 5 * 1024 * 1024 } });
 
 const uploadImages = (req, res, next) => {
   upload.array('images', 5)(req, res, (err) => {
@@ -53,10 +46,16 @@ router.get('/:id', async (req, res) => {
 router.post('/', protect, uploadImages, async (req, res) => {
   try {
     const { name, price, description, specs, category, inStock, featured } = req.body;
-    const images = req.files?.map(f => `/uploads/${f.filename}`) || [];
+    const images = (await saveUploadedFiles(req.files)).slice(0, 5);
     const product = await Product.create({
-      name, price: Number(price), description, specs, category,
-      inStock: inStock === 'true', featured: featured === 'true', images
+      name,
+      price: Number(price),
+      description,
+      specs,
+      category,
+      inStock: inStock === 'true',
+      featured: featured === 'true',
+      images,
     });
     res.status(201).json(product);
   } catch (err) {
@@ -67,12 +66,30 @@ router.post('/', protect, uploadImages, async (req, res) => {
 router.put('/:id', protect, uploadImages, async (req, res) => {
   try {
     const { name, price, description, specs, category, inStock, featured, existingImages } = req.body;
-    const newImages = req.files?.map(f => `/uploads/${f.filename}`) || [];
-    const kept = existingImages ? (Array.isArray(existingImages) ? existingImages : [existingImages]) : [];
-    const images = [...kept, ...newImages];
+    let kept = [];
+    if (existingImages) {
+      try {
+        const parsed = JSON.parse(existingImages);
+        kept = Array.isArray(parsed) ? parsed : parseFormArray(existingImages);
+      } catch {
+        kept = parseFormArray(existingImages);
+      }
+    }
+    const newImages = await saveUploadedFiles(req.files);
+    const images = [...kept, ...newImages].slice(0, 5);
+
     const product = await Product.findByIdAndUpdate(
       req.params.id,
-      { name, price: Number(price), description, specs, category, inStock: inStock === 'true', featured: featured === 'true', images },
+      {
+        name,
+        price: Number(price),
+        description,
+        specs,
+        category,
+        inStock: inStock === 'true',
+        featured: featured === 'true',
+        images,
+      },
       { new: true }
     );
     res.json(product);

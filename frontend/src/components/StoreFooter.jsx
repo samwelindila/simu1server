@@ -21,7 +21,7 @@ export default function StoreFooter() {
             <ul className="space-y-2.5 text-sm font-body">
               <li>
                 <a href={`https://wa.me/${WHATSAPP_E164}`} target="_blank" rel="noreferrer" className="flex items-center gap-2 text-slate-400 hover:text-emerald-400 transition-colors">
-                  <WhatsAppIcon className="w-3.5 h-3.5" /> WhatsApp {WHATSAPP_DISPLAY}
+                  <WhatsAppIcon className="w-3.5 h-3.5" /> {WHATSAPP_DISPLAY}
                 </a>
               </li>
               <li>
